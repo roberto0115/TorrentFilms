@@ -9,6 +9,8 @@
   "author": "Roberto Álvrez Paraja",
   "license": "ISC",
   "dependencies": {
-    "inquirer": "^8.2.0"
+    "cli-progress": "^3.9.1",
+    "inquirer": "^8.2.0",
+    "playwright": "^1.17.1"
   }
 }
