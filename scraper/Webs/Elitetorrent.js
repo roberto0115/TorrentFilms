@@ -25,7 +25,7 @@ const NumResultados= async (page)=>{
 }
 const getEnlaces = async(page,params)=>{
     Enlaces = []
-    for(i = 1; i<=(Res.numResultados > params.max ?params.max:Res.numResultados); i++){
+    for(i = 1; i<=(Res.numResultados > params.length ?params.length:Res.numResultados); i++){
         const busqueda = ":nth-match(.imagen a,"+i+")"
         const href =await page.getAttribute(busqueda,"href")
         Enlaces.push(href)

@@ -1,6 +1,7 @@
 const inquier = require('inquirer')
-const Choices = require('inquirer/lib/objects/choices')
 const scraper = require('./scraper/index')
+const parseTorrent = require('parse-torrent')
+const inquirer = require('inquirer')
 
 inquier.prompt({
     name: "busqueda",
@@ -8,7 +9,12 @@ inquier.prompt({
 }).then(async(answer) => {
     console.log(`-- Buscando ${answer.busqueda} ...`)
     const res = await scraper({name : answer.busqueda})
-    resultadosBusqueda(res)
+    if(res.numResultados > 0){
+        resultadosBusqueda(res)
+    }else{
+        console.log('No se han encontrado resultados')
+        process.exit()
+    }
 
 })
 const resultadosBusqueda= (res)=>{
@@ -39,14 +45,31 @@ const resultadosBusqueda= (res)=>{
         }).then((answer)=>{
             if(answer.Descargar === "Si"){
                 console.log(`-- Descargando Torrent ...`)
-                descargarTorrent(res, index)
+                AnalizarTorrent(res.resultados[index].torrent)
             }else{
                 resultadosBusqueda(res)
             }
         })
     })
 }
-const descargarTorrent = (res, index)=>{
-    console.log('Torrent')
-    process.exit()
+const descargarTorrent =  (torrentId,parsedTorrent)=>{
+    console.log(parsedTorrent.files.length+' archivos encontrados')
+     for(i = 0; i<parsedTorrent.files.length; i++){
+         console.log(`${i+1}) ${parsedTorrent.files[i].path} => (${parsedTorrent.files[i].length})`)
+    }
+    inquirer.prompt({
+        type: 'checkbox',
+        name: 'files',
+        mesage: '¿Que archivos del Torrent quiere descargar?',
+        choices: parsedTorrent.files
+    }).then((answer)=>{
+        console.log('Descargando '+answer.files)
+    })
+    // process.exit()
+}
+const AnalizarTorrent = (torrentId)=>{
+    parseTorrent.remote(torrentId, (err, parsedTorrent) => {
+        if (err) throw err
+        descargarTorrent(torrentId,parsedTorrent)
+    })
 }
